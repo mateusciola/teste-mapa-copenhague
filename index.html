@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Mapa de Copenhague - Dicas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { width: 100vw; height: 100vh; }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // Inicializa o mapa em Copenhague
+    var map = L.map('map').setView([55.6761, 12.5683], 13);
+
+    // Adiciona o fundo do mapa (OpenStreetMap)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    // Lista de lugares legais
+    var lugares = [
+        { nome: "Nyhavn", coords: [55.6805, 12.5873], desc: "Canal icônico, perfeito para fotos e cafés." },
+        { nome: "Tivoli Gardens", coords: [55.6736, 12.5681], desc: "Parque de diversões clássico no centro da cidade." },
+        { nome: "The Little Mermaid", coords: [55.6929, 12.5990], desc: "Estátua famosa, parada obrigatória!" },
+        { nome: "Christianshavn", coords: [55.6730, 12.5931], desc: "Bairro charmoso com canais e a comunidade de Christiania." },
+        { nome: "Rosenborg Castle", coords: [55.6865, 12.5770], desc: "Castelo histórico com jardins e joias da coroa." }
+    ];
+
+    // Adiciona marcadores no mapa
+    lugares.forEach(function(lugar) {
+        L.marker(lugar.coords).addTo(map)
+            .bindPopup("<b>" + lugar.nome + "</b><br>" + lugar.desc);
+    });
+
+    // Geolocalização do usuário
+    map.locate({setView: true, maxZoom: 15});
+
+    function onLocationFound(e) {
+        var radius = e.accuracy / 2;
+        L.marker(e.latlng).addTo(map)
+            .bindPopup("Você está aqui! Precisão: " + Math.round(radius) + " metros.").openPopup();
+
+        L.circle(e.latlng, radius).addTo(map);
+    }
+
+    function onLocationError(e) {
+        alert("Não foi possível obter sua localização: " + e.message);
+    }
+
+    map.on('locationfound', onLocationFound);
+    map.on('locationerror', onLocationError);
+
+</script>
+
+</body>
+</html>
