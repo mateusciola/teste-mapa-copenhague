@@ -38,35 +38,43 @@
 
     // Rota com OpenRouteService
     async function adicionarRota() {
-        const start = [12.5415, 55.6923]; // Bangertsgade 9
-        const end = [12.5552, 55.6915];   // Coffee Collective
-        const apiKey = '5b3ce3597851110001cf6248846557b6361d4bd0a991c4d4715e53b1';
+    const start = [12.55376, 55.68913]; // Bangertsgade 9
+    const end = [12.542404, 55.693655];   // Coffee Collective
+    const apiKey = '5b3ce3597851110001cf6248846557b6361d4bd0a991c4d4715e53b1';
 
-        try {
-            const response = await fetch('https://api.openrouteservice.org/v2/directions/foot-walking', {
-                method: 'POST',
-                headers: {
-                    'Authorization': apiKey,
-                    'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ coordinates: [start, end] })
-            });
+    try {
+        const response = await fetch('https://api.openrouteservice.org/v2/directions/foot-walking', {
+            method: 'POST',
+            headers: {
+                'Authorization': apiKey,
+                'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ coordinates: [start, end] })
+        });
 
-            const data = await response.json();
-            const coords = data.features[0].geometry.coordinates.map(c => [c[1], c[0]]);
+        const data = await response.json();
+        console.log('Resposta da API:', data);  // 👈 Adicionado
 
-            L.polyline(coords, {
-                color: 'orange',
-                weight: 6,
-                opacity: 0.9,
-                dashArray: '10,6'
-            }).addTo(map);
+        if (!data.features || !data.features[0]) {
+            console.error('Resposta inesperada da API:', data);
+            alert('Não foi possível gerar a rota. Verifique as coordenadas ou a chave da API.');
+            return;
+        }
 
-            L.marker([55.6923, 12.5415]).addTo(map).bindPopup("Início: Bangertsgade 9");
-            L.marker([55.6915, 12.5552]).addTo(map).bindPopup("Fim: Coffee Collective");
-        } catch (error) {
-            console.error("Erro ao carregar rota:", error);
+        const coords = data.features[0].geometry.coordinates.map(c => [c[1], c[0]]);
+        L.polyline(coords, {
+            color: 'orange',
+            weight: 6,
+            opacity: 0.9,
+            dashArray: '10,6'
+        }).addTo(map);
+
+        L.marker([55.6923, 12.5415]).addTo(map).bindPopup(\"Início: Bangertsgade 9\");
+        L.marker([55.6915, 12.5552]).addTo(map).bindPopup(\"Fim: Coffee Collective\");
+
+    } catch (error) {
+        console.error(\"Erro ao carregar rota:\", error);
         }
     }
 
